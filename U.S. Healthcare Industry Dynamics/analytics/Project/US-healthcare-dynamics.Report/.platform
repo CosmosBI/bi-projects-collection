@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "US-healthcare-dynamics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "002ca00e-bddd-40a3-adba-ae47633a49c2"
+  }
+}

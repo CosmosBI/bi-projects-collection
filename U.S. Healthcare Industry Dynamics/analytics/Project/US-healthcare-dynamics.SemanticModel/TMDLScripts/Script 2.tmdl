@@ -1,0 +1,2132 @@
+createOrReplace
+
+	model Model
+		culture: en-US
+		defaultPowerBIDataSourceVersion: powerBI_V3
+		sourceQueryCulture: en-IN
+		dataAccessOptions
+			legacyRedirects
+			returnErrorValuesAsNull
+
+		table CptCode_Lookup
+			lineageTag: 3b6f9283-8614-41d5-a9cf-c1c95fc0b447
+
+			column dimCPTCodePK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: b3ed20d5-f218-417a-9b31-7887a2de1685
+				summarizeBy: none
+				sourceColumn: dimCPTCodePK
+
+				annotation SummarizationSetBy = Automatic
+
+			column CptCode
+				dataType: string
+				lineageTag: 159bc3d7-9ed6-4a17-b170-9a6927122cb6
+				summarizeBy: none
+				sourceColumn: CptCode
+
+				annotation SummarizationSetBy = Automatic
+
+			column CptDesc
+				dataType: string
+				lineageTag: 2d88caf8-3efa-4286-9765-7bd255af149f
+				summarizeBy: none
+				sourceColumn: CptDesc
+
+				annotation SummarizationSetBy = Automatic
+
+			column CptGrouping
+				dataType: string
+				lineageTag: 7615a1a2-fc4e-4ac0-aaa8-a430ff8f80de
+				summarizeBy: none
+				sourceColumn: CptGrouping
+
+				annotation SummarizationSetBy = Automatic
+
+			partition CptCode_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimCptCode.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimCPTCodePK", Int64.Type}, {"CptCode", type text}, {"CptDesc", type text}, {"CptGrouping", type text}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table DateTableTemplate_be97c3f8-f201-4a00-a952-d6592f333bdd
+			isHidden
+			isPrivate
+			lineageTag: c59bafae-5f15-44de-8719-02be21d25800
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: 9d2cdae3-e65d-46fa-a8ee-37ca3a0be921
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 33365813-3d23-4318-a677-a0e8879454be
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 2409e2e7-53b0-43f9-b9ba-e48df2e4738b
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: bd288a42-e394-4808-aa48-cbd6b92ea8ff
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: 805a842f-cf41-4379-8dd3-14de536a2850
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 445111db-b15a-4d87-8bc9-233f44371725
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: d5dae772-c2f9-434a-b251-b2e86acb2977
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: a369a6c6-bb90-4fca-927f-8f3c1861b1b9
+
+				level Year
+					lineageTag: a74a6348-cf3c-4b9e-af44-3fcc989ef5a4
+					column: Year
+
+				level Quarter
+					lineageTag: b9f0fa42-54f1-4889-8313-b909d0bd667c
+					column: Quarter
+
+				level Month
+					lineageTag: 551e5dcd-66c4-424d-a21d-ea6e834f024f
+					column: Month
+
+				level Day
+					lineageTag: a28e9611-5c84-4f53-9917-85c48fa79370
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition DateTableTemplate_be97c3f8-f201-4a00-a952-d6592f333bdd = calculated
+				mode: import
+				source = Calendar(Date(2015,1,1), Date(2015,1,1))
+
+			annotation __PBI_TemplateDateTable = true
+
+			annotation DefaultItem = DateHierarchy
+
+		table DimDate
+			lineageTag: 47793d11-5323-4abf-8dd7-8916e038b4b0
+
+			column Date
+				dataType: dateTime
+				isKey
+				formatString: Long Date
+				lineageTag: 8a33ffc0-9181-41cf-8f29-9aaed8ddaace
+				summarizeBy: none
+				sourceColumn: Date
+
+				variation Variation
+					isDefault
+					relationship: ef07f678-a38d-4aa5-bc93-634219012f14
+					defaultHierarchy: LocalDateTable_a249ec34-7878-4151-b4c2-6a7b636bf3c0.'Date Hierarchy'
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column Year
+				dataType: int64
+				formatString: 0
+				lineageTag: d08e94c5-d90b-4293-9cf2-a968a5bc7b9d
+				summarizeBy: sum
+				sourceColumn: Year
+
+				annotation SummarizationSetBy = Automatic
+
+			column Month
+				dataType: string
+				lineageTag: 8035c441-f75c-4c3d-b87a-5469b5a0eecf
+				summarizeBy: none
+				sourceColumn: Month
+
+				annotation SummarizationSetBy = Automatic
+
+			column MonthPeriod
+				dataType: int64
+				formatString: 0
+				lineageTag: cb862e75-0713-4de6-b306-77d216710025
+				summarizeBy: sum
+				sourceColumn: MonthPeriod
+
+				changedProperty = IsHidden
+
+				annotation SummarizationSetBy = Automatic
+
+			column MonthYear
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: d56e1ac8-3098-47bc-bb51-028acd63fd88
+				summarizeBy: none
+				sourceColumn: MonthYear
+
+				variation Variation
+					isDefault
+					relationship: 4266d993-8b55-4511-a8be-29be1ec75a82
+					defaultHierarchy: LocalDateTable_ef34a3ff-4085-4eda-a1df-b58a8db8be46.'Date Hierarchy'
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column Day
+				dataType: int64
+				formatString: 0
+				lineageTag: 45093c64-98f5-479d-b561-5a64f1187c78
+				summarizeBy: sum
+				sourceColumn: Day
+
+				annotation SummarizationSetBy = Automatic
+
+			column DayName
+				dataType: string
+				lineageTag: 99704d39-26b8-4cfd-99a7-7a2bc0153f19
+				summarizeBy: none
+				sourceColumn: DayName
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Start of Month'
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: a2c72251-fcb1-42f8-a98b-344834b9b05a
+				summarizeBy: none
+				sourceColumn: Start of Month
+
+				variation Variation
+					isDefault
+					relationship: 4dbda24e-0393-4fb8-875f-dc75bb0f4340
+					defaultHierarchy: LocalDateTable_2c2a61ff-39c4-4f0c-97ac-a6a7efb97db4.'Date Hierarchy'
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column 'Day of Week'
+				dataType: int64
+				formatString: 0
+				lineageTag: 3e6cbecc-871b-4910-8b0d-1d683813344e
+				summarizeBy: sum
+				sourceColumn: Day of Week
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Day Name'
+				dataType: string
+				lineageTag: 1b5bb41e-a282-4d0d-ba03-3070abfafb17
+				summarizeBy: none
+				sourceColumn: Day Name
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Year.1'
+				dataType: int64
+				formatString: 0
+				lineageTag: a14b2129-b909-440e-9c72-3f3b84d7577e
+				summarizeBy: sum
+				sourceColumn: Year.1
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Month.1'
+				dataType: int64
+				formatString: 0
+				lineageTag: 593c2d14-7c6c-435e-9318-6b7ab7ab756e
+				summarizeBy: sum
+				sourceColumn: Month.1
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'End of Month'
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: 6567750f-cc93-4c2e-8457-9c924914d4bf
+				summarizeBy: none
+				sourceColumn: End of Month
+
+				variation Variation
+					isDefault
+					relationship: 0aac270f-953e-4d46-a716-400699dc5bed
+					defaultHierarchy: LocalDateTable_39bba987-77ed-4008-8322-dd29e2cc2f25.'Date Hierarchy'
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column ShortDayName = left(DimDate[DayName],3)
+				lineageTag: 543be405-a649-416c-b37a-c5876bf70e58
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column ShortDayName2 = SUBSTITUTE(DimDate[Day Name],"day","")
+				lineageTag: 438b35c4-12a3-47b1-b4e1-1cba04d82d23
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column DayOfWeek = WEEKDAY(DimDate[Date].[Date],2)
+				formatString: 0
+				lineageTag: 94b75835-3be6-4636-903c-f66b214f60fc
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			column Weekend = IF(DimDate[DayOfWeek] = 6 || DimDate[DayOfWeek] = 7, "Weekend", "Weekday")
+				lineageTag: 497ce406-9e57-4a61-8a87-7e23c027a9d6
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column WeekNum = WEEKNUM(DimDate[Date].[Date])
+				formatString: 0
+				lineageTag: a936fc70-e34f-48f0-8963-9d062ff8c8a5
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			column Years = YEAR(DimDate[Date].[Date])
+				formatString: 0
+				lineageTag: 9185cd61-fc0d-4f59-9b75-c96579262337
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			column Months = MONTH(DimDate[Date])
+				formatString: 0
+				lineageTag: ab9d6909-59f0-4fe8-a2f6-1481707e54f1
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DimDate = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimDate.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", type date}, {"Year", Int64.Type}, {"Month", type text}, {"MonthPeriod", Int64.Type}, {"MonthYear", type date}, {"Day", Int64.Type}, {"DayName", type text}}),
+						    #"Inserted Start of Month" = Table.AddColumn(#"Changed Type", "Start of Month", each Date.StartOfMonth([Date]), type date),
+						    #"Inserted Day of Week" = Table.AddColumn(#"Inserted Start of Month", "Day of Week", each Date.DayOfWeek([Date]), Int64.Type),
+						    #"Inserted Day Name" = Table.AddColumn(#"Inserted Day of Week", "Day Name", each Date.DayOfWeekName([Date]), type text),
+						    #"Inserted End of Week" = Table.AddColumn(#"Inserted Day Name", "End of Week", each Date.EndOfWeek([Date]), type date),
+						    #"Removed Columns" = Table.RemoveColumns(#"Inserted End of Week",{"End of Week"}),
+						    #"Inserted Year" = Table.AddColumn(#"Removed Columns", "Year.1", each Date.Year([Date]), Int64.Type),
+						    #"Inserted Month" = Table.AddColumn(#"Inserted Year", "Month.1", each Date.Month([Date]), Int64.Type),
+						    #"Inserted End of Month" = Table.AddColumn(#"Inserted Month", "End of Month", each Date.EndOfMonth([Date]), type date),
+						    #"Added Conditional Column" = Table.AddColumn(#"Inserted End of Month", "Custom", each if [Day Name] = "saturday || sunday" then "weekend" else "weekday"),
+						    #"Removed Columns1" = Table.RemoveColumns(#"Added Conditional Column",{"Custom"})
+						in
+						    #"Removed Columns1"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table LocalDateTable_a249ec34-7878-4151-b4c2-6a7b636bf3c0
+			isHidden
+			showAsVariationsOnly
+			lineageTag: 6adaeaf8-77d9-40b7-b29b-5183b6c8bb0d
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: 70233a6e-4717-4388-8b51-0d15734b1c58
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 278b2de7-8e3d-4140-9de7-1a7e97293d4d
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: f682c699-2765-4656-abac-355029c97d72
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: f75b6376-c971-4b47-8fcc-7a5770065bc5
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: cf08cbbc-bb7e-4460-b716-1e8cf0dde24c
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 149178ec-12d3-4c66-8cdb-c619192c94b2
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: afc119b8-0256-4a6c-b64b-3dd227382f0d
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: e31dcb77-89d3-47fc-88f1-0b7e0075bb82
+
+				level Year
+					lineageTag: 76122295-806a-494a-99a1-15cbd8818f64
+					column: Year
+
+				level Quarter
+					lineageTag: 70d2f7e2-bd66-4d72-8eeb-24dbff5927aa
+					column: Quarter
+
+				level Month
+					lineageTag: 2f8bf9c6-c2d4-4fba-9b9a-32d16a725f23
+					column: Month
+
+				level Day
+					lineageTag: 9d299a5a-7120-4d0f-9512-86436c8e99cb
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition LocalDateTable_a249ec34-7878-4151-b4c2-6a7b636bf3c0 = calculated
+				mode: import
+				source = Calendar(Date(Year(MIN('DimDate'[Date])), 1, 1), Date(Year(MAX('DimDate'[Date])), 12, 31))
+
+			annotation __PBI_LocalDateTable = true
+
+		table LocalDateTable_ef34a3ff-4085-4eda-a1df-b58a8db8be46
+			isHidden
+			showAsVariationsOnly
+			lineageTag: 435d8297-e185-4eb0-b8fe-07abb3b50b86
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: 75e1e818-33bb-467e-bfa4-3b387bb6c948
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: b97c08c8-bae3-4aae-96ae-ff9eedb94577
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: e8fdb481-f154-496f-aabd-8e50e6c786fe
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: 16d8bf06-bc8c-4eca-8a3d-6e4f9b84de6d
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: 7f1fe967-61c0-4f4e-af32-e2d437748815
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 8dc8afb3-882e-4195-a5dc-bad76d51f366
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 090c96cd-90f8-4238-9572-4a0d6a98bd1b
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: c5558ecd-272a-459c-921f-7fe9debe1aae
+
+				level Year
+					lineageTag: 9303525c-85ed-4daf-a08b-8e5bede0738d
+					column: Year
+
+				level Quarter
+					lineageTag: 481b54a2-374e-4eb2-8e30-f361b73bb629
+					column: Quarter
+
+				level Month
+					lineageTag: 8e39d6d6-7ce9-4628-ba2d-c533476655c3
+					column: Month
+
+				level Day
+					lineageTag: 6c546ab5-bac2-4884-b91e-de8c59d72b40
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition LocalDateTable_ef34a3ff-4085-4eda-a1df-b58a8db8be46 = calculated
+				mode: import
+				source = Calendar(Date(Year(MIN('DimDate'[MonthYear])), 1, 1), Date(Year(MAX('DimDate'[MonthYear])), 12, 31))
+
+			annotation __PBI_LocalDateTable = true
+
+		table DiagnosisCode_Lookup
+			lineageTag: f8635ace-4679-4bb7-bcc1-5f760dd39048
+
+			column dimDiagnosisCodePK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: 00fcb4a9-f99d-4ba4-95e6-eafb8e2d28a8
+				summarizeBy: none
+				sourceColumn: dimDiagnosisCodePK
+
+				annotation SummarizationSetBy = Automatic
+
+			column DiagnosisCode
+				dataType: string
+				lineageTag: adf1e722-2e70-4058-bf72-0d932ef65548
+				summarizeBy: none
+				sourceColumn: DiagnosisCode
+
+				annotation SummarizationSetBy = Automatic
+
+			column DiagnosisCodeDescription
+				dataType: string
+				lineageTag: 77c2de27-64c6-48c7-9dad-761565b7901b
+				summarizeBy: none
+				sourceColumn: DiagnosisCodeDescription
+
+				annotation SummarizationSetBy = Automatic
+
+			column DiagnosisCodeGroup
+				dataType: string
+				lineageTag: 315c0ff9-b38e-4c55-871e-c685de025417
+				summarizeBy: none
+				sourceColumn: DiagnosisCodeGroup
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DiagnosisCode_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimDiagnosisCode.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimDiagnosisCodePK", Int64.Type}, {"DiagnosisCode", type text}, {"DiagnosisCodeDescription", type text}, {"DiagnosisCodeGroup", type text}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Hospital_Lookup
+			lineageTag: 3ee14b08-9680-460f-b678-942450d3bc37
+
+			column dimHospitalPK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: ad5e4bd7-fa5d-416b-9055-30fd821600f8
+				summarizeBy: none
+				sourceColumn: dimHospitalPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column HospitalName
+				dataType: string
+				lineageTag: 5738eded-0dc2-4c14-869f-f5ba1193495a
+				summarizeBy: none
+				sourceColumn: HospitalName
+
+				annotation SummarizationSetBy = Automatic
+
+			column IsHospitalNameLong = if(len(Hospital_Lookup[HospitalName])>20,"yes","no")
+				lineageTag: d25dbae1-5bee-4ec0-9376-85672bbabc72
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			partition Hospital_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimHospital.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimLocationPK", Int64.Type}, {"LocationName", type text}}),
+						    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"dimLocationPK", "dimHospitalPK"}, {"LocationName", "HospitalName"}})
+						in
+						    #"Renamed Columns"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Patient_Lookup
+			lineageTag: 46544736-353c-481a-841f-6c9a9d6cbdb5
+
+			column dimPatientPK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: 8c225935-2f91-4809-8de0-eaf19c164f3f
+				summarizeBy: none
+				sourceColumn: dimPatientPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientNumber
+				dataType: int64
+				formatString: 0
+				lineageTag: 87cc124d-20a0-4de9-8711-823e35e133b4
+				summarizeBy: sum
+				sourceColumn: PatientNumber
+
+				annotation SummarizationSetBy = Automatic
+
+			column FirstName
+				dataType: string
+				lineageTag: 42f11d5d-e93a-4a78-8270-669abe7ce674
+				summarizeBy: none
+				sourceColumn: FirstName
+
+				annotation SummarizationSetBy = Automatic
+
+			column LastName
+				dataType: string
+				lineageTag: 1b406434-8a5d-4b1b-ab42-8c10ce605154
+				summarizeBy: none
+				sourceColumn: LastName
+
+				annotation SummarizationSetBy = Automatic
+
+			column Email
+				dataType: string
+				lineageTag: 9bb3a937-0118-4645-8e0a-be5621d92afa
+				summarizeBy: none
+				sourceColumn: Email
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientGender
+				dataType: string
+				lineageTag: 2b659fc1-d797-47fd-9d9f-17c5bb68c311
+				summarizeBy: none
+				sourceColumn: PatientGender
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientAge
+				dataType: int64
+				formatString: 0
+				lineageTag: af803339-ed0b-42ad-aead-c33dd82c5d73
+				summarizeBy: sum
+				sourceColumn: PatientAge
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'PatientHeight(in cms)'
+				dataType: int64
+				formatString: 0
+				lineageTag: ae1794bc-ec70-4796-9249-6cfcee9a20ed
+				summarizeBy: sum
+				sourceColumn: PatientHeight(in cms)
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Year of Birth'
+				dataType: int64
+				formatString: 0
+				lineageTag: 6af739bd-b528-42f5-aacd-5b06fbb7bbb4
+				summarizeBy: sum
+				sourceColumn: Year of Birth
+
+				annotation SummarizationSetBy = Automatic
+
+			column Month
+				dataType: int64
+				formatString: 0
+				lineageTag: 67c9e86a-391e-4d16-8cc4-f409c10a5150
+				summarizeBy: sum
+				sourceColumn: Month
+
+				annotation SummarizationSetBy = Automatic
+
+			column Day
+				dataType: int64
+				formatString: 0
+				lineageTag: 2e39b3f1-9f7e-4788-a494-170a7aff9cdf
+				summarizeBy: sum
+				sourceColumn: Day
+
+				annotation SummarizationSetBy = Automatic
+
+			column BloodGroup
+				dataType: string
+				lineageTag: 974f8ddc-b5bc-4319-9bb6-59896454b14f
+				summarizeBy: none
+				sourceColumn: BloodGroup
+
+				annotation SummarizationSetBy = Automatic
+
+			column Tobacco
+				dataType: string
+				lineageTag: 41811f71-4ac2-4aff-a02d-ef51294c8bbc
+				summarizeBy: none
+				sourceColumn: Tobacco
+
+				annotation SummarizationSetBy = Automatic
+
+			column Alcohol
+				dataType: string
+				lineageTag: 789e7df5-5c77-4e02-a41f-550d731362f6
+				summarizeBy: none
+				sourceColumn: Alcohol
+
+				annotation SummarizationSetBy = Automatic
+
+			column Exercise
+				dataType: string
+				lineageTag: 6d2ed448-c92e-43b6-b992-13698cd8ca24
+				summarizeBy: none
+				sourceColumn: Exercise
+
+				annotation SummarizationSetBy = Automatic
+
+			column Diet
+				dataType: string
+				lineageTag: 63f2e09c-01e7-4cdc-97be-92a691fcca9f
+				summarizeBy: none
+				sourceColumn: Diet
+
+				annotation SummarizationSetBy = Automatic
+
+			column Ethinicity
+				dataType: string
+				lineageTag: 389d6b8f-f143-4ff4-a0bf-b3843d584883
+				summarizeBy: none
+				sourceColumn: Ethinicity
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Zip Codes'
+				dataType: int64
+				formatString: 0
+				lineageTag: 5ca1f4b4-a5ac-4d38-92fd-f0ca9261d2fc
+				summarizeBy: sum
+				sourceColumn: Zip Codes
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'State Code'
+				dataType: string
+				lineageTag: 94c905d9-4848-43d1-a3e7-dd67522d0ce0
+				summarizeBy: none
+				sourceColumn: State Code
+
+				annotation SummarizationSetBy = Automatic
+
+			column City
+				dataType: string
+				lineageTag: 1b227d1e-d013-4a57-b06b-73dbcb3a2ef4
+				summarizeBy: none
+				sourceColumn: City
+
+				annotation SummarizationSetBy = Automatic
+
+			column State
+				dataType: string
+				lineageTag: 1ecb4a8f-82da-408c-86b0-f462d82bad7a
+				summarizeBy: none
+				sourceColumn: State
+
+				annotation SummarizationSetBy = Automatic
+
+			column Region
+				dataType: string
+				lineageTag: 64a40963-b0bc-43cf-ba5a-3ba3b2b7c294
+				summarizeBy: none
+				sourceColumn: Region
+
+				annotation SummarizationSetBy = Automatic
+
+			column DateOfBirth = DATE(Patient_Lookup[Year of Birth],Patient_Lookup[Month],Patient_Lookup[Day])
+				formatString: Short Date
+				lineageTag: 3098e1b0-80cc-4f64-8433-e5958f4b0ac3
+				summarizeBy: none
+
+				variation Variation
+					isDefault
+					relationship: b7755729-6fe2-4791-831e-76e2267653b2
+					defaultHierarchy: LocalDateTable_d31a6fc7-dba3-4410-a53a-de9bb2d5b1c2.'Date Hierarchy'
+
+				changedProperty = DataType
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column MonthName = Patient_Lookup[DateOfBirth].[Month]
+				lineageTag: c92e1c05-72d7-4c88-bf3c-a1aa9bb3f902
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column ageofPatient = DATEDIFF(Patient_Lookup[DateOfBirth],TODAY(),YEAR)
+				formatString: 0
+				lineageTag: 16e75c8a-0b9d-4e2b-9326-62a76beeefcc
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientFullName = Patient_LookUp[FirstName]&" "&Patient_LookUp[LastName]
+				lineageTag: 05da4218-5d33-4f0a-b79c-bfb6e8ac02b6
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column Age>50 = if(Patient_LookUp[PatientAge] > 50, "Yes", "No")
+				lineageTag: faee2a97-d886-40a9-8105-34fdeb7e9ee6
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column Patient_AT = AND(Patient_LookUp[Alcohol]="Yes", Patient_LookUp[Tobacco]="Yes")
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: df697c34-2c91-4242-81ac-176b6cdd1a78
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column Patient_ATD = ```
+					((Patient_LookUp[Alcohol] = "Yes") && 
+					    (Patient_LookUp[Tobacco] = "Yes") && 
+					    (Patient_LookUp[Diet] = "Yes"))
+					```
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: c6c6e183-bb8e-4a06-b694-59f5f67b709c
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column RegionCode = ```
+					SWITCH(Patient_LookUp[Region],"West","W",
+					    "South","S",
+					    "Northeast","NE",
+					    "Midwest","MW"
+					    
+					)
+					```
+				lineageTag: 0754f873-0b8e-4951-a719-b423c4d7f9b0
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column Patient_!AT = AND(Patient_LookUp[Alcohol]="No",Patient_LookUp[Tobacco]="No")
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: eeabd7a1-d5eb-42f6-9e34-35f2b7f40a0e
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column fn = CONCATENATE(Patient_Lookup[FirstName],Patient_Lookup[LastName])
+				lineageTag: 553cdf72-c562-4362-9225-e75419cd7d98
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientFullName_UPPER = UPPER(Patient_LookUp[PatientFullName])
+				lineageTag: ee83503b-878d-4948-845a-bcadabb55773
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Rounded Age' = ```
+					ROUND('Patient_Lookup'[PatientAge], 0)
+					
+					```
+				formatString: 0
+				lineageTag: a1f1acdc-8c8f-4ed3-8304-076240ce4cf5
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			partition Patient_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimPatient.csv"),[Delimiter=",", Columns=22, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimPatientPK", Int64.Type}, {"PatientNumber", Int64.Type}, {"FirstName", type text}, {"LastName", type text}, {"Email", type text}, {"PatientGender", type text}, {"PatientAge", Int64.Type}, {"PatientHeight(in cms)", Int64.Type}, {"Year of Birth", Int64.Type}, {"Month", Int64.Type}, {"Day", Int64.Type}, {"BloodGroup", type text}, {"Tobacco", type text}, {"Alcohol", type text}, {"Exercise", type text}, {"Diet", type text}, {"Ethinicity", type text}, {"Zip Codes", Int64.Type}, {"State Code", type text}, {"City", type text}, {"State", type text}, {"Region", type text}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Payer_Lookup
+			lineageTag: 96a6a792-6db8-49da-915e-56aa83174e5f
+
+			column dimPayerPK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: d49dbadf-da29-46df-83c8-dcee7b461cbd
+				summarizeBy: none
+				sourceColumn: dimPayerPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column PayerName
+				dataType: string
+				lineageTag: 23b88ec2-1bd9-4cd1-bcf6-6284162e84df
+				summarizeBy: none
+				sourceColumn: PayerName
+
+				annotation SummarizationSetBy = Automatic
+
+			partition Payer_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimPayer.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimPayerPK", Int64.Type}, {"PayerName", type text}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Physician_Lookup
+			lineageTag: 0f2cc991-d109-4368-87cc-f1d7146994f6
+
+			column dimPhysicianPK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: afd30dd7-8383-4e9f-9ff2-c63ef4a73beb
+				summarizeBy: none
+				sourceColumn: dimPhysicianPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column ProviderNpi
+				dataType: int64
+				formatString: 0
+				lineageTag: 10c03b04-a281-4cc6-b842-8013ee44e4c3
+				summarizeBy: sum
+				sourceColumn: ProviderNpi
+
+				annotation SummarizationSetBy = Automatic
+
+			column ProviderName
+				dataType: string
+				lineageTag: 4e1d69d3-f2ca-47dd-8d67-03c2321b96cc
+				summarizeBy: none
+				sourceColumn: ProviderName
+
+				annotation SummarizationSetBy = Automatic
+
+			column SpecialityCodeFK
+				dataType: string
+				lineageTag: 272eb531-a966-473d-a651-cc4d87ae0a61
+				summarizeBy: none
+				sourceColumn: SpecialityCodeFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column ProviderFTE
+				dataType: double
+				lineageTag: a506ffa7-af66-4a31-84e9-c007364a66c3
+				summarizeBy: sum
+				sourceColumn: ProviderFTE
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			partition Physician_Lookup = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimPhysician.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimPhysicianPK", Int64.Type}, {"ProviderNpi", Int64.Type}, {"ProviderName", type text}, {"SpecialityCode", type text}, {"ProviderFTE", type number}}),
+						    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"SpecialityCode", "SpecialityCodeFK"}})
+						in
+						    #"Renamed Columns"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Specialty
+			lineageTag: d4262559-2d9c-4d8b-8d47-851056f6ae3f
+
+			column SpecialityCodePK
+				dataType: string
+				isKey
+				lineageTag: 13f4ed49-80d1-4ec7-ac39-ac9baef57d9d
+				summarizeBy: none
+				sourceColumn: SpecialityCodePK
+
+				annotation SummarizationSetBy = Automatic
+
+			column ProviderSpecialty
+				dataType: string
+				lineageTag: b652e60a-ab03-4855-b8f7-43c7613135ce
+				summarizeBy: none
+				sourceColumn: ProviderSpecialty
+
+				annotation SummarizationSetBy = Automatic
+
+			column SpecialityType
+				dataType: string
+				lineageTag: 714b69b4-a709-4a86-966d-5182c82deb41
+				summarizeBy: none
+				sourceColumn: SpecialityType
+
+				annotation SummarizationSetBy = Automatic
+
+			column SpecialityDesc
+				dataType: string
+				lineageTag: 6f7f4d44-5aa5-4400-8172-1c8e8b3e15ae
+				summarizeBy: none
+				sourceColumn: SpecialityDesc
+
+				annotation SummarizationSetBy = Automatic
+
+			partition Specialty = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimSpecialty.csv"),[Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+						    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}}),
+						    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+						    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"SpecialityCode", type text}, {"ProviderSpecialty", type text}, {"SpecialityType", type text}, {"SpecialityDesc", type text}}),
+						    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"SpecialityCode", "SpecialityCodePK"}})
+						in
+						    #"Renamed Columns"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table Transaction
+			lineageTag: c89278f5-0451-4f51-806b-ba250c5e6296
+
+			column dimTransactionPK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: 8522456c-d027-4f5a-9f39-342906b39a5d
+				summarizeBy: none
+				sourceColumn: dimTransactionPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column TransactionType
+				dataType: string
+				lineageTag: 9022227c-b7d8-42e8-9480-1ce09bf24aff
+				summarizeBy: none
+				sourceColumn: TransactionType
+
+				annotation SummarizationSetBy = Automatic
+
+			column Transaction
+				dataType: string
+				lineageTag: 776870db-ae79-4911-bb7a-17523010328f
+				summarizeBy: none
+				sourceColumn: Transaction
+
+				annotation SummarizationSetBy = Automatic
+
+			column AdjustmentReason
+				dataType: string
+				lineageTag: 6420e694-f25f-4901-a865-8ec24b389b0a
+				summarizeBy: none
+				sourceColumn: AdjustmentReason
+
+				annotation SummarizationSetBy = Automatic
+
+			partition Transaction = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\DimTransaction.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"dimTransactionPK", Int64.Type}, {"TransactionType", type text}, {"Transaction", type text}, {"AdjustmentReason", type text}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table 'Healthcare Figures'
+			lineageTag: 7a8a3d22-96b8-42be-9347-669fdde018b0
+
+			column FactTablePK
+				dataType: int64
+				isKey
+				formatString: 0
+				lineageTag: c487614c-7494-4bca-8e8b-5c1c22619a1e
+				summarizeBy: sum
+				sourceColumn: FactTablePK
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Check Dimension'
+				dataType: int64
+				formatString: 0
+				lineageTag: 0a161a77-bf98-4df6-814f-0e15dcc906a1
+				summarizeBy: sum
+				sourceColumn: Check Dimension
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimPatientFK
+				dataType: int64
+				formatString: 0
+				lineageTag: fe277cd4-b8da-436d-a759-2de42809f285
+				summarizeBy: none
+				sourceColumn: dimPatientFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimPhysicianFK
+				dataType: int64
+				formatString: 0
+				lineageTag: 57c31d2e-c66d-4420-bae5-c0ba8f70c0db
+				summarizeBy: none
+				sourceColumn: dimPhysicianFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimDateServicePK
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: bad1549f-abce-4970-9bdb-d2d95a8f5b33
+				summarizeBy: none
+				sourceColumn: dimDateServicePK
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column dimDatePostPK
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: 217255f8-13c2-42b0-bf92-388c4eab9422
+				summarizeBy: none
+				sourceColumn: dimDatePostPK
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column dimCPTCodeFK
+				dataType: int64
+				formatString: 0
+				lineageTag: 2383e160-c2f2-4836-93de-f0229f6b8c6c
+				summarizeBy: none
+				sourceColumn: dimCPTCodeFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimPayerFK
+				dataType: int64
+				formatString: 0
+				lineageTag: 03be7169-f8f4-4817-9581-8b37baebb3e8
+				summarizeBy: none
+				sourceColumn: dimPayerFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimTransactionFK
+				dataType: int64
+				formatString: 0
+				lineageTag: 14d89110-db46-4f19-9876-f906e2535b2a
+				summarizeBy: none
+				sourceColumn: dimTransactionFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimHospitalFK
+				dataType: int64
+				formatString: 0
+				lineageTag: 78e2b67e-2427-4c59-8a87-c7dce8eeb446
+				summarizeBy: none
+				sourceColumn: dimHospitalFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientNumber
+				dataType: int64
+				formatString: 0
+				lineageTag: 6376517c-f7a7-4c45-8839-a1b8c81c7a7f
+				summarizeBy: sum
+				sourceColumn: PatientNumber
+
+				annotation SummarizationSetBy = Automatic
+
+			column dimDiagnosisCodeFK
+				dataType: int64
+				formatString: 0
+				lineageTag: cff01557-4ce1-433f-aa7c-eecf1d995d1b
+				summarizeBy: none
+				sourceColumn: dimDiagnosisCodeFK
+
+				annotation SummarizationSetBy = Automatic
+
+			column CPTUnits
+				dataType: int64
+				formatString: 0
+				lineageTag: ae922d42-771c-4832-a682-a00375f2bba5
+				summarizeBy: sum
+				sourceColumn: CPTUnits
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Gross Expenses'
+				dataType: double
+				lineageTag: b9cc656d-accd-4c5a-843e-7fb5044224d5
+				summarizeBy: sum
+				sourceColumn: Gross Expenses
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column Adjustment
+				dataType: int64
+				formatString: 0
+				lineageTag: a04892d2-0f78-4523-a4cb-997000fdfd6d
+				summarizeBy: sum
+				sourceColumn: Adjustment
+
+				annotation SummarizationSetBy = Automatic
+
+			column Insurance_Payment
+				dataType: int64
+				formatString: 0
+				lineageTag: 2d1fcd37-28f3-4bd6-94c5-6e9775e14d2f
+				summarizeBy: sum
+				sourceColumn: Insurance_Payment
+
+				annotation SummarizationSetBy = Automatic
+
+			column Patient_Payment
+				dataType: double
+				lineageTag: cab760fb-d33e-4394-8ad5-016dd5a71b46
+				summarizeBy: sum
+				sourceColumn: Patient_Payment
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column AR
+				dataType: double
+				lineageTag: 8bf6dd1b-f574-4506-9e64-2ebb1415b7f1
+				summarizeBy: sum
+				sourceColumn: AR
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column Dayoftheweek = WEEKDAY('Healthcare Figures'[dimDatePostPK],2)
+				formatString: 0
+				lineageTag: bb720a40-3d69-4452-ac15-75dba4ca360e
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+			column CPTUnitType = IF('Healthcare Figures'[CPTUnits] = 1, "Single Unit", "Multiple Unit")
+				lineageTag: b78ad66e-184f-4b16-a506-3d2f42fb05e5
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column TotalPayment = ('Healthcare Figures'[Insurance_Payment] + 'Healthcare Figures'[Patient_Payment])
+				lineageTag: e5247ad8-2983-4caf-be39-25cca0b166e2
+				summarizeBy: sum
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column PatientGender = RELATED(Patient_Lookup[PatientGender])
+				lineageTag: 4825763f-8865-4cd1-a1f9-19bccd342c09
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientEthinicity = related(Patient_Lookup[Ethinicity])
+				lineageTag: 4ea17fe6-e470-4f50-bd58-d9ad14c82f99
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column PatientCity = related(Patient_Lookup[City])
+				lineageTag: e882cb41-169a-404a-b556-0838807d07e4
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column RegionCode = RELATED(Patient_Lookup[RegionCode])
+				lineageTag: 48802caa-d8a9-42c7-859f-f67881b5110f
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			partition 'Healthcare Figures' = m
+				mode: import
+				queryGroup: Facts
+				source =
+						let
+						    Source = Csv.Document(File.Contents("C:\Users\metsy\OneDrive\Documents\GitHub\Powerbi-Projects-Collection\U.S. Healthcare Industry Dynamics\data\FactTable.csv"),[Delimiter=",", Columns=18, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+						    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"FactTablePK", Int64.Type}, {"Check Dimension", Int64.Type}, {"dimPatientPK", Int64.Type}, {"dimPhysicianPK", Int64.Type}, {"dimDateServicePK", type date}, {"dimDatePostPK", type date}, {"dimCPTCodePK", Int64.Type}, {"dimPayerPK", Int64.Type}, {"dimTransactionPK", Int64.Type}, {"dimLocationPK", Int64.Type}, {"PatientNumber", Int64.Type}, {"dimDiagnosisCodePK", Int64.Type}, {"CPTUnits", Int64.Type}, {"Gross Expenses", type number}, {"Adjustment", Int64.Type}, {"Insurance_Payment", Int64.Type}, {"Patient_Payment", type number}, {"AR", type number}}),
+						    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"dimCPTCodePK", "dimCPTCodeFK"}, {"dimDiagnosisCodePK", "dimDiagnosisCodeFK"}, {"dimLocationPK", "dimLocationFK"}, {"dimPatientPK", "dimPatientFK"}, {"dimPayerPK", "dimPayerFK"}, {"dimPhysicianPK", "dimPhysicianFK"}, {"dimTransactionPK", "dimTransactionFK"}}),
+						    #"Removed Errors" = Table.RemoveRowsWithErrors(#"Renamed Columns", {"Adjustment"}),
+						    #"Renamed Columns1" = Table.RenameColumns(#"Removed Errors",{{"dimLocationFK", "dimHospitalFK"}})
+						in
+						    #"Renamed Columns1"
+
+			annotation PBI_ResultType = Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+		table 'Measure Table'
+			lineageTag: f8ad7cfa-7c92-4094-8b39-00ec9eb0ddb8
+
+			measure TotalInsurancePay = SUM('Healthcare Figures'[Insurance_Payment])
+				formatString: 0
+				lineageTag: f3a3282c-f87f-4d7d-a850-0110260c3e49
+
+			measure TotalPatientPay = SUM('Healthcare Figures'[Patient_Payment])
+				lineageTag: 0cd81acd-6892-4369-80a8-b5420f954a50
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure AverageInsurancePay = AVERAGE('Healthcare Figures'[Insurance_Payment])
+				lineageTag: 0c316129-ed81-453a-b25e-d476c7c96cff
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure AveragePatientPay = AVERAGE('Healthcare Figures'[Patient_Payment])
+				lineageTag: 58176d22-2869-4741-919f-3cb3347b464f
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure TotalPayment = SUM('Healthcare Figures'[Insurance_Payment]) + SUM('Healthcare Figures'[Patient_Payment])
+				lineageTag: 4e98f27a-628e-4646-839e-f2302f999e3f
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure %InsurancePay = [TotalInsurancePay]/[TotalPayment]
+				lineageTag: 9b62b236-9a9c-4cbd-9e5e-b65183288f73
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure CountPatient = COUNT(Patient_Lookup[dimPatientPK])
+				formatString: 0
+				lineageTag: b1595786-7860-42a9-8a38-e98f7120a576
+
+			measure DistinctPatient = DISTINCTCOUNT('Healthcare Figures'[dimPatientFK])
+				formatString: 0
+				lineageTag: 1b5b4073-7883-4c8f-877b-01e683b92d04
+
+			measure Insurance_Tobacco = CALCULATE([TotalInsurancePay],Patient_LookUp[Tobacco] = "Yes")
+				formatString: 0
+				lineageTag: 04ad4dfb-287a-4c7f-a67f-d775bc097c90
+
+			measure Insurance_A+ = CALCULATE([TotalInsurancePay], Patient_LookUp[BloodGroup] = "A+")
+				formatString: 0
+				lineageTag: 27ff36c2-e9eb-453a-bb8b-2ed6a60166e4
+
+			measure Avg_Pay_Females_B+ =
+					CALCULATE(
+					    [AveragePatientPay],
+					    Patient_LookUp[PatientGender] = "Female",
+					    Patient_LookUp[BloodGroup] = "B+"
+					)
+				lineageTag: 3e5a559e-84ef-436a-973e-4609e1d95d97
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure Avg_Pay_Males_B+ =
+					CALCULATE(
+					    [AveragePatientPay],
+					    Patient_LookUp[PatientGender] = "Male",
+					    Patient_LookUp[BloodGroup] = "B+"
+					)
+				lineageTag: da3e259b-c7c1-453d-bdd0-6f0412b056d9
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure FemalePatient =
+					CALCULATE(
+					    [CountPatient],
+					    Patient_LookUp[PatientGender] = "Female"
+					)
+				formatString: 0
+				lineageTag: 6e99c0f5-fc6f-4667-aed7-20a111a0b76b
+
+			measure TotalFemales = CALCULATE([FemalePatient],ALL(Patient_LookUp))
+				formatString: 0
+				lineageTag: 51514083-c835-4f12-9a3f-993c3c8a215f
+
+			measure %Females = DIVIDE([FemalePatient],[TotalFemales])
+				lineageTag: d95726a5-e04d-4564-978e-3abe0779ff6d
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure MalePatient =
+					CALCULATE(
+					    [CountPatient],
+					    Patient_LookUp[PatientGender] = "Male"
+					)
+				formatString: 0
+				lineageTag: e5658a07-2a7a-46e8-aa57-e2824de5dd3c
+
+			measure TotalMales = CALCULATE([MalePatient],ALL(Patient_LookUp))
+				formatString: 0
+				lineageTag: d71a8bae-e02c-462a-9791-f58e52514cbc
+
+			measure %Males = DIVIDE([MalePatient],[TotalMales])
+				lineageTag: ad73f462-0a02-4d24-aa63-faf52716dec7
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure YTDPayment = calculate([TotalPayment],DATESYTD(DimDate[Date]))
+				lineageTag: 12dcaad3-4da3-4933-b2c0-f92f314e1bbf
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'Previous MonthPay' = calculate([TotalPayment],DATEADD(DimDate[Date],-1,MONTH))
+				lineageTag: 4b145d45-9eb8-4d49-ac0f-fd903a9d6e9f
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 10DayROllingPay = calculate([TotalPatientPay],DATESINPERIOD(DimDate[Date],max(DimDate[Date]),-10,DAY))
+				lineageTag: 539f8d6d-accc-4c0e-8719-07eaf60de113
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure TotalPayMA =
+					DIVIDE(CALCULATE
+					([TotalPayment], DATESINPERIOD(DimDate[Date],MAX(DimDate[Date]),-10,DAY)),10)
+				lineageTag: a6dcebf9-6367-4ffa-ba74-5cf9c316f609
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure TotalGrossExpense = SUM('Healthcare Figures'[Gross Expenses])
+				lineageTag: e220c87f-aaba-4d6c-b509-10ba87c2071f
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure BadDebts =
+					CALCULATE([TotalGrossExpense],
+					'Healthcare Figures'[dimTransactionFK] = 55711 || 'Healthcare Figures'[dimTransactionFK] = 48429 || 'Healthcare Figures'[dimTransactionFK] = 55042 )
+				lineageTag: 6f7a07a9-8c9c-4696-9973-e942ebd829e6
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'ARGE Ratio' = SUM('Healthcare Figures'[AR])/SUM('Healthcare Figures'[Gross Expenses])
+				formatString: 0%;-0%;0%
+				lineageTag: d133af80-d074-43b4-b906-f55c7a7f77e2
+
+			measure 'IPTP Ratio' = SUM('Healthcare Figures'[Insurance_Payment])/[TotalPayment]
+				formatString: 0%;-0%;0%
+				lineageTag: d16138b1-3736-413c-9af4-45077d3b20a2
+
+			measure %PaymentPay = [TotalPatientPay]/[TotalPayment]
+				lineageTag: 46872630-faea-4e60-a1b2-bc0839e1f25a
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure AverageDeficit = AVERAGEX('Healthcare Figures', 'Healthcare Figures'[Gross Expenses] - [TotalPayment])
+				lineageTag: efb49687-4ef3-4b98-ae33-34c692ecd61e
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure QTDPayment =
+					CALCULATE([TotalPayment],
+					    DATESQTD(DimDate[Date])
+					)
+				lineageTag: fa0aa5cc-64dd-4702-8683-476c6849cf91
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure TotalDeficit = SUMX('Healthcare Figures', 'Healthcare Figures'[Gross Expenses] - [TotalPayment])
+				lineageTag: c4114712-7194-4c83-a18f-f3ac84903daa
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			partition 'Measure Table' = m
+				mode: import
+				source =
+						let
+						    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+						    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+						    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+						in
+						    #"Removed Columns"
+
+			annotation PBI_ResultType = Table
+
+		table LocalDateTable_2c2a61ff-39c4-4f0c-97ac-a6a7efb97db4
+			isHidden
+			showAsVariationsOnly
+			lineageTag: 615022d9-ad97-4aa2-a369-a413d0283fa6
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: 03e3c828-b313-4146-8133-57714d240aec
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 11cafd14-4fcc-4762-a7f9-fbc50361d300
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: deabb755-0b4d-4fd6-b8b2-fe818fa5e127
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: c2560938-4a9e-4807-a903-90d926b825bd
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: 0e84a02c-10a9-497e-b4d1-c9a760935c37
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 1c8ed2fa-7853-4cc7-a46f-1cdf70d9e60f
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 9b68cc85-999b-4f72-aa4c-fb08a3f40cb3
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: 7b4f306b-4a31-4259-867d-802460fd9198
+
+				level Year
+					lineageTag: d4b735c4-698b-482e-8bff-dbe5b51bde4d
+					column: Year
+
+				level Quarter
+					lineageTag: 80112e80-caeb-4eb3-b842-6692671eafa7
+					column: Quarter
+
+				level Month
+					lineageTag: 554f8b98-6ceb-42c5-898c-68f4c1615c3f
+					column: Month
+
+				level Day
+					lineageTag: d6b2d904-2060-4d1d-9157-46da912f26a7
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition LocalDateTable_2c2a61ff-39c4-4f0c-97ac-a6a7efb97db4 = calculated
+				mode: import
+				source = Calendar(Date(Year(MIN('DimDate'[Start of Month])), 1, 1), Date(Year(MAX('DimDate'[Start of Month])), 12, 31))
+
+			annotation __PBI_LocalDateTable = true
+
+		table LocalDateTable_39bba987-77ed-4008-8322-dd29e2cc2f25
+			isHidden
+			showAsVariationsOnly
+			lineageTag: 2905084e-4980-488c-ae9e-67b48f5bfb65
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: b06d7da8-c4db-4939-915a-6e61ae190311
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 366db425-bd23-40f0-acfa-1d58c4ea21ec
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 15f0cb0c-f66c-430f-8654-80763a9c7fad
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: fa3182a4-eec8-4bd7-98f3-bedb3dd6f01a
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: 0df524af-8861-4d0e-aca8-93928833b14d
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 616021de-739f-4cbe-8253-12bbcb144f19
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 27a3beb3-9082-4513-9aaa-6c33e0c3a34b
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: fed3f886-9b46-460d-865c-6ab7984fa0e8
+
+				level Year
+					lineageTag: d53e7131-6fe5-4387-829f-e625bf439311
+					column: Year
+
+				level Quarter
+					lineageTag: f7d09eb0-7168-4bbc-8e7a-5f1c3069f1e6
+					column: Quarter
+
+				level Month
+					lineageTag: aa0bba72-1e2d-4e14-bf21-74943b913c4d
+					column: Month
+
+				level Day
+					lineageTag: 097fe2f8-d75f-4ab2-826c-db4440fca6f9
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition LocalDateTable_39bba987-77ed-4008-8322-dd29e2cc2f25 = calculated
+				mode: import
+				source = Calendar(Date(Year(MIN('DimDate'[End of Month])), 1, 1), Date(Year(MAX('DimDate'[End of Month])), 12, 31))
+
+			annotation __PBI_LocalDateTable = true
+
+		table LocalDateTable_d31a6fc7-dba3-4410-a53a-de9bb2d5b1c2
+			isHidden
+			showAsVariationsOnly
+			lineageTag: 1cf1b343-e1b2-481f-ba35-20aa3399f759
+
+			column Date
+				dataType: dateTime
+				isHidden
+				lineageTag: a8128a37-a42e-4c51-9edc-d7e49f6aac39
+				dataCategory: PaddedDateTableDates
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Date]
+
+				annotation SummarizationSetBy = User
+
+			column Year = YEAR([Date])
+				dataType: int64
+				isHidden
+				lineageTag: 81c286c6-2fdb-410e-8f98-19a4e6afd5e8
+				dataCategory: Years
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Year
+
+			column MonthNo = MONTH([Date])
+				dataType: int64
+				isHidden
+				lineageTag: bb5ccefb-d2b0-4f86-9fa6-351de1ba3322
+				dataCategory: MonthOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = MonthNumber
+
+			column Month = FORMAT([Date], "MMMM")
+				dataType: string
+				isHidden
+				lineageTag: 314867cf-929e-45a1-a9c2-b9d1fb326d0d
+				dataCategory: Months
+				summarizeBy: none
+				sortByColumn: MonthNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Month
+
+			column QuarterNo = INT(([MonthNo] + 2) / 3)
+				dataType: int64
+				isHidden
+				lineageTag: 9d2ed31b-aef2-420e-8bc9-7d9c1b722588
+				dataCategory: QuarterOfYear
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = QuarterNumber
+
+			column Quarter = "Qtr " & [QuarterNo]
+				dataType: string
+				isHidden
+				lineageTag: 80bf3113-e844-480f-928a-a3611657739d
+				dataCategory: Quarters
+				summarizeBy: none
+				sortByColumn: QuarterNo
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Quarter
+
+			column Day = DAY([Date])
+				dataType: int64
+				isHidden
+				lineageTag: d9a102ce-5b1f-4fab-a0e3-0d4481a53017
+				dataCategory: DayOfMonth
+				summarizeBy: none
+
+				annotation SummarizationSetBy = User
+
+				annotation TemplateId = Day
+
+			hierarchy 'Date Hierarchy'
+				lineageTag: 410f693e-17d6-4184-9d00-e247c83728e7
+
+				level Year
+					lineageTag: b6e36967-ffbc-4e88-b11f-bd35482fcba0
+					column: Year
+
+				level Quarter
+					lineageTag: 1c77170e-b43c-4489-9683-1a3dd3bfd03c
+					column: Quarter
+
+				level Month
+					lineageTag: 22221f20-5dca-423f-b271-9f54a6f81f3c
+					column: Month
+
+				level Day
+					lineageTag: cb35400e-536d-469c-89aa-11be9f336b5e
+					column: Day
+
+				annotation TemplateId = DateHierarchy
+
+			partition LocalDateTable_d31a6fc7-dba3-4410-a53a-de9bb2d5b1c2 = calculated
+				mode: import
+				source = Calendar(Date(Year(MIN('Patient_Lookup'[DateOfBirth])), 1, 1), Date(Year(MAX('Patient_Lookup'[DateOfBirth])), 12, 31))
+
+			annotation __PBI_LocalDateTable = true
+
+		table BadDebtTable
+			lineageTag: c1bc4d2b-574f-4d7a-a66d-aaed18815181
+
+			column dimTransactionPK
+				formatString: 0
+				lineageTag: d955dc2d-6820-4a4d-946b-aab67c2390b0
+				summarizeBy: sum
+				isNameInferred
+				sourceColumn: Transaction[dimTransactionPK]
+				columnOrigin: Transaction.dimTransactionPK
+
+				annotation SummarizationSetBy = Automatic
+
+			column TransactionType
+				lineageTag: 05e7314a-8667-46b7-89eb-3afc33c34a69
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: Transaction[TransactionType]
+				columnOrigin: Transaction.TransactionType
+
+				annotation SummarizationSetBy = Automatic
+
+			column Transaction
+				lineageTag: 0ab7d045-ed39-492b-9109-3ec684859053
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: Transaction[Transaction]
+				columnOrigin: Transaction.Transaction
+
+				annotation SummarizationSetBy = Automatic
+
+			column AdjustmentReason
+				lineageTag: 47d17ab5-7f72-461d-9f35-81706c4829cd
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: Transaction[AdjustmentReason]
+				columnOrigin: Transaction.AdjustmentReason
+
+				annotation SummarizationSetBy = Automatic
+
+			partition BadDebtTable = calculated
+				mode: import
+				source = FILTER('Transaction','Transaction'[AdjustmentReason] = "Bad Debt")
+
+			annotation PBI_Id = bded3153502942d8849ad74424184688
+
+		table 'Adjustment factor (%)'
+			lineageTag: a435a397-b722-48f7-91ef-71870531aa35
+
+			measure 'Adjustment factor (%) Value' = SELECTEDVALUE('Adjustment factor (%)'[Adjustment factor (%)], 0)
+				lineageTag: 2c8a1de1-2e5f-4de8-b9d1-bd24ade8c590
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure Adjustedgrossexpense = (SUM('Healthcare Figures'[Gross Expenses]))*(1+ 'Adjustment factor (%)'[Adjustment factor (%) Value])
+				lineageTag: 9abd56fa-2014-46af-9f34-a940ce6d870e
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column 'Adjustment factor (%)'
+				lineageTag: 26e84984-1567-4ed2-b493-18e57c00e729
+				summarizeBy: none
+				sourceColumn: [Value]
+
+				extendedProperty ParameterMetadata = {"version":0}
+
+				annotation SummarizationSetBy = User
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			partition 'Adjustment factor (%)' = calculated
+				mode: import
+				source = GENERATESERIES(-1, 1, 0.1)
+
+			annotation PBI_Id = a86769813c9940c6bebe15c47842d0ab
+
+		relationship ef07f678-a38d-4aa5-bc93-634219012f14
+			joinOnDateBehavior: datePartOnly
+			fromColumn: DimDate.Date
+			toColumn: LocalDateTable_a249ec34-7878-4151-b4c2-6a7b636bf3c0.Date
+
+		relationship 4266d993-8b55-4511-a8be-29be1ec75a82
+			joinOnDateBehavior: datePartOnly
+			fromColumn: DimDate.MonthYear
+			toColumn: LocalDateTable_ef34a3ff-4085-4eda-a1df-b58a8db8be46.Date
+
+		relationship 1ec57380-a6ad-4167-a014-b869d44fdd9d
+			fromColumn: 'Healthcare Figures'.dimCPTCodeFK
+			toColumn: CptCode_Lookup.dimCPTCodePK
+
+		relationship 74027f06-fb82-49fa-a33b-f298d940fe48
+			fromColumn: 'Healthcare Figures'.dimDiagnosisCodeFK
+			toColumn: DiagnosisCode_Lookup.dimDiagnosisCodePK
+
+		relationship ff42d36c-bb30-4d45-81a7-42f391cfc8b6
+			fromColumn: 'Healthcare Figures'.dimHospitalFK
+			toColumn: Hospital_Lookup.dimHospitalPK
+
+		relationship 29bf3b58-5472-4639-a52b-8d59bf8e7ded
+			fromColumn: 'Healthcare Figures'.dimPatientFK
+			toColumn: Patient_Lookup.dimPatientPK
+
+		relationship 106bf874-22f8-4219-9596-6b24cf2d482a
+			fromColumn: 'Healthcare Figures'.dimTransactionFK
+			toColumn: Transaction.dimTransactionPK
+
+		relationship 8a4085d2-6fb3-4e79-8648-86ee563da410
+			fromColumn: Physician_Lookup.SpecialityCodeFK
+			toColumn: Specialty.SpecialityCodePK
+
+		relationship f1e93211-b535-4bc0-9951-bad2169fd5bb
+			crossFilteringBehavior: bothDirections
+			fromColumn: 'Healthcare Figures'.dimPhysicianFK
+			toColumn: Physician_Lookup.dimPhysicianPK
+
+		relationship b2baae95-93fe-4a44-bd3b-e9e72d54308e
+			fromColumn: 'Healthcare Figures'.dimDateServicePK
+			toColumn: DimDate.Date
+
+		relationship c9e01a17-cf3b-4550-97bd-ff9e653594bc
+			isActive: false
+			fromColumn: 'Healthcare Figures'.dimDatePostPK
+			toColumn: DimDate.Date
+
+		relationship 4dbda24e-0393-4fb8-875f-dc75bb0f4340
+			joinOnDateBehavior: datePartOnly
+			fromColumn: DimDate.'Start of Month'
+			toColumn: LocalDateTable_2c2a61ff-39c4-4f0c-97ac-a6a7efb97db4.Date
+
+		relationship 0aac270f-953e-4d46-a716-400699dc5bed
+			joinOnDateBehavior: datePartOnly
+			fromColumn: DimDate.'End of Month'
+			toColumn: LocalDateTable_39bba987-77ed-4008-8322-dd29e2cc2f25.Date
+
+		relationship b7755729-6fe2-4791-831e-76e2267653b2
+			joinOnDateBehavior: datePartOnly
+			fromColumn: Patient_Lookup.DateOfBirth
+			toColumn: LocalDateTable_d31a6fc7-dba3-4410-a53a-de9bb2d5b1c2.Date
+
+		relationship c9360cd1-f097-4104-a3ea-c9fb974f5904
+			fromColumn: 'Healthcare Figures'.dimPayerFK
+			toColumn: Payer_Lookup.dimPayerPK
+
+		cultureInfo en-US
+
+			linguisticMetadata = {"Version":"1.0.0","Language":"en-US"}
+				contentType: json
+
+		queryGroup Dimensions
+
+			annotation PBI_QueryGroupOrder = 0
+
+		queryGroup Facts
+
+			annotation PBI_QueryGroupOrder = 1
+
+		annotation PBI_QueryOrder = ["CptCode_Lookup","DimDate","DiagnosisCode_Lookup","Hospital_Lookup","Patient_Lookup","Payer_Lookup","Physician_Lookup","Specialty","Transaction","Healthcare Figures","Measure Table"]
+
+		annotation __PBI_TimeIntelligenceEnabled = 1
+
+		annotation PBIDesktopVersion = 2.139.2054.0 (24.12)+334ca1c95b576cc53924655643b0d36f21caac55
+
+		annotation PBI_ProTooling = ["DaxQueryView_Desktop","TMDLView_Desktop"]
+

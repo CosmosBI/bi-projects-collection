@@ -1,0 +1,4 @@
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "%Males", 'Measure Table'[%Males]
+    )
